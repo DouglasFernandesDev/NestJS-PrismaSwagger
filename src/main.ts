@@ -5,7 +5,6 @@ import { ConflictInterceptor } from './commom/errors/interceptos/conflict.interc
 import { DatabaseInterceptor } from './commom/errors/interceptos/database.interceptor';
 import { NotFoundInterceptor } from './commom/errors/interceptos/notfound.interceptor';
 import { UnauthorizedInterceptor } from './commom/errors/interceptos/unauthorized.interceptor';
-import { HttpExceptionFilter } from './commom/filters/http.exception.filter';
 
 const PORT = 3000;
 
