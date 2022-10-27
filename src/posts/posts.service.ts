@@ -19,7 +19,7 @@ export class PostsService {
     const user = await this.repository.findOne(id);
 
     if (!user) {
-      throw new NotFoundError('Usuário nao encontrado');
+      throw new NotFoundError('Post nao encontrado');
     }
     return user;
   }
