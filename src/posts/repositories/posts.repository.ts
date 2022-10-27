@@ -40,23 +40,74 @@ export class PostsRepository {
   }
 
   async findAll(): Promise<PostEntity[]> {
-    return this.prisma.post.findMany();
-  }
-
-  async findOne(id: number): Promise<PostEntity> {
-    return this.prisma.post.findUnique({
-      where: {
-        id,
+    return this.prisma.post.findMany({
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
   }
 
-  async update(id: number, updateUPostDto: UpdatePostDto): Promise<PostEntity> {
-    return this.prisma.post.update({
-      where: {
-        id,
+  async findOne(id: number): Promise<PostEntity> {
+    return this.prisma.post.findUnique({
+      where: { id },
+      include: {
+        author: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
-      data: updateUPostDto,
+    });
+  }
+
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<PostEntity> {
+    const { authorEmail } = updatePostDto;
+
+    if (!authorEmail) {
+      return this.prisma.post.update({
+        data: updatePostDto,
+        where: {
+          id,
+        },
+      });
+    }
+
+    delete updatePostDto.authorEmail;
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: authorEmail,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundError('Author not found!');
+    }
+
+    const data: Prisma.PostUpdateInput = {
+      ...updatePostDto,
+      author: {
+        connect: {
+          email: authorEmail,
+        },
+      },
+    };
+
+    return this.prisma.post.update({
+      where: { id },
+      data,
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
   }
 
